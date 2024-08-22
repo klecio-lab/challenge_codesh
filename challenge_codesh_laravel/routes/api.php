@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FoodFactController;
+use App\Http\Controllers\HealthCheckController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/', [HealthCheckController::class, 'index']);
 Route::get('/products', [FoodFactController::class, 'index']);
 Route::get('/products/{code}', [FoodFactController::class, 'show']);
 Route::put('/products/{code}', [FoodFactController::class, 'update']);
