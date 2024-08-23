@@ -37,6 +37,9 @@ class SyncFoodFacts extends Command
             // Obter o caminho completo do arquivo salvo (opcional)
             $fileFullPath = Storage::path($jsonFilePath);
 
+             // Libera a memória ao remover as variáveis
+            unset($compressedJsonFoodFacts, $jsonFoodFactData);
+
             $this->dispatchFoodFactsByChunkJob($fileFullPath);
         }
     }
