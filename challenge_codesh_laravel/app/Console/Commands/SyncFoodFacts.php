@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\ProcessFoodFactsByChunkJob;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\LazyCollection;
@@ -21,7 +22,7 @@ class SyncFoodFacts extends Command
 
     public function handle()
     {
-        $fileNames = explode("\n", trim(Http::get($this->filesUrl)->body()));
+        $fileNames = explode("\n", trim(Http::timeout(30)->get($this->filesUrl)->body()));
 
         foreach ($fileNames as $fileName) {
             $compressedJsonFoodFacts = file_get_contents($this->urlJsonFoodFacts . $fileName);
@@ -46,8 +47,7 @@ class SyncFoodFacts extends Command
 
     public function dispatchFoodFactsByChunkJob($fileFullPath){
         LazyCollection::make(function () use($fileFullPath) {
-            $filePath = $fileFullPath;
-            $file = fopen($filePath, 'r');
+            $file = fopen($fileFullPath, 'r');
 
             while ($line = fgets($file)) {
                 yield $line;
@@ -55,19 +55,14 @@ class SyncFoodFacts extends Command
 
             fclose($file);
         })
-        ->chunk(2)
+        ->chunk(100) // define o tamanho do chunk
         ->each(function ($linesChunk) {
-
-            $dataBatch = [];
-
-            foreach ($linesChunk as $line) {
-                $jsonData = json_decode($line, true);
-                dd($jsonData);
-                $dataBatch[] = $jsonData;
-            }
-            dd($dataBatch[]);
             // Despacha um job para processar este batch
-            // ProcessFoodFactsByChunkJob::dispatch($dataBatch);
+            ProcessFoodFactsByChunkJob::dispatch($linesChunk);
+            // dd($linesChunk);
         });
+
+        Cache::put('last_cron_run', now());
     }
+
 }

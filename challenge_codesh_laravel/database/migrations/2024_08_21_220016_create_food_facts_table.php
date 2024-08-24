@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('food_facts', function (Blueprint $table) {
             $table->id();
-            $table->integer('code')->unique();
+            $table->string('code')->unique();
             $table->enum('status', ['draft', 'trash', 'published']);
             $table->timestamp('imported_t');
             $table->string('url');
