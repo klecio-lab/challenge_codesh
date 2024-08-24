@@ -126,6 +126,13 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'error-sync-food-facts' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/error-sync-food-facts.log'),
+            'level' => 'debug',
+            'days' => 4,
+        ],
     ],
 
 ];
