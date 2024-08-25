@@ -59,7 +59,7 @@ class SyncFoodFacts extends Command
         })
         ->chunk(100) // define o tamanho do chunk
         ->each(function ($linesChunk) {
-            try {
+
                 $dataBatch = [];
 
                 foreach ($linesChunk as $line) {
@@ -67,7 +67,8 @@ class SyncFoodFacts extends Command
                     $jsonData = json_decode($line, true);
 
                     // Filtra e estrutura os dados que você deseja salvar
-                    $dataBatch[] = [
+                    // $dataBatch[] = [
+                    $dataBatch = [
                         'code' => (string)ltrim($jsonData['code'], '"') ?? null,
                         'status' => 'draft', // ou defina conforme a lógica do seu sistema
                         'imported_t' => now(),
@@ -95,22 +96,22 @@ class SyncFoodFacts extends Command
                         'updated_at' => now(),
                     ];
 
-                }
-                $characterLimit = 400;
-                foreach ($dataBatch as $key => $value) {
-                    foreach ($value as $key => $data) {
-                        if (strlen($data) > $characterLimit) {
-                            Log::info("campo avacalhado --- O campo '{$key}' tem mais de {$characterLimit} caracteres.\n");
-                        }
+                    try {
+                        FoodFact::updateOrCreate([
+                            'code' => $dataBatch['code']
+                        ], $dataBatch);
+
+                        // FoodFact::insert($dataBatch);
+                        Log::info("code: ",  [$dataBatch['code']]);
+
+                    } catch (\Exception $e) {
+                        Log::channel('error-sync-food-facts')->debug("erro ao sincronizar:\n", [
+                            'message' => $e->getMessage(),
+                            'dataBatch' => $dataBatch
+                        ]);
                     }
                 }
-                FoodFact::insert($dataBatch);
-            } catch (\Exception $e) {
-                Log::channel('error-sync-food-facts')->debug("erro ao sincronizar:\n", [
-                    'message' => $e->getMessage(),
-                    'dataBatch' => $dataBatch
-                ]);
-            }
+
 
             // Despacha um job para processar este batch
             // ProcessFoodFactsByChunkJob::dispatch($linesChunk);

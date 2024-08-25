@@ -24,12 +24,12 @@ return new class extends Migration
             $table->string('quantity');
             $table->string('brands');
             $table->text('categories');
-            $table->string('labels')->nullable();
+            $table->text('labels')->nullable();
             $table->string('cities')->nullable();
             $table->text('purchase_places')->nullable();
             $table->string('stores')->nullable();
             $table->text('ingredients_text');
-            $table->string('traces')->nullable();
+            $table->text('traces')->nullable();
             $table->string('serving_size');
             $table->float('serving_quantity');
             $table->integer('nutriscore_score');
