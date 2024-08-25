@@ -94,4 +94,7 @@ Execute os seguintes comandos para configurar e iniciar o projeto:
 ./vendor/bin/sail artisan schedule:work
 ```
 
+video explicando projeto
+https://drive.google.com/file/d/1dtJ6fEx3oqPjjWZzuHpW7kltg9zlM22d/view?usp=sharing
+
 >  This is a challenge by [Coodesh](https://coodesh.com/)
